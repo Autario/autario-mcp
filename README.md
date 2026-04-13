@@ -1,2 +1,20 @@
 # autario-mcp
-Autario MCP server | Query 2,500+ verified datasets from your AI agent
+
+MCP server for [autario](https://autario.com) | Search, query, and publish charts across 2,500+ verified public datasets.
+
+## Quick Start
+
+```json
+{
+  "mcpServers": {
+    "autario": {
+      "command": "npx",
+      "args": ["autario-mcp"]
+    }
+  }
+}
+```
+
+Or install globally:
+
+npm install -g autario-mcp
