@@ -44,14 +44,15 @@ Connect any MCP-compatible AI (Claude, ChatGPT, Cursor) to 2,500+ verified datas
 
 ## Example
 
-Ask your AI: *"Compare military spending between USA, China, and Russia since 1960"*
+Ask your AI: *"Compare military spending between USA, China, Russia, India, Germany since 1960"*
 
 The AI will:
 1. Search autario for military spending data
 2. Query the SIPRI dataset
 3. Build a Plotly chart spec
-4. Publish it to autario.com
+4. (Optional): Publish it to autario.com, if you have pasted your autario Key & Secret into the config
 
+![Military Spending Chart](https://autario.com/charts/images/XGhjrwCS.png)
 Result: [autario.com/chart/XGhjrwCS](https://autario.com/chart/XGhjrwCS)
 
 ## Remote MCP
