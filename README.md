@@ -1,6 +1,6 @@
 # autario-mcp
 
-MCP server for [autario](https://autario.com) — search, query, and publish charts across 2,500+ verified public datasets.
+MCP server for [autario](https://autario.com). Search, query, and publish charts across 2,500+ verified public datasets.
 
 ## Quick Start
 
@@ -63,11 +63,11 @@ You can also connect via HTTP (no npm install needed):
 
 ## API Keys
 
-Reading data is free — no key needed. For publishing charts or creating datasets, get free API keys at [autario.com/account](https://autario.com/account?tab=apikeys).
+Reading data is free. No key needed. For publishing charts or creating datasets, get free API keys at [autario.com/account](https://autario.com/account?tab=apikeys).
 
 ## Data Sources
 
-World Bank, IMF, Eurostat, OECD, FRED, WHO, SIPRI, IEA, FAO, NASA, NOAA, BLS, UNODC — 2,500+ datasets covering economics, trade, health, demographics, energy, military, environment, and more.
+World Bank, IMF, Eurostat, OECD, FRED, WHO, SIPRI, IEA, FAO, NASA, NOAA, BLS, UNODC. 2,500+ datasets covering economics, trade, health, demographics, energy, military, environment, and more.
 
 ## Links
 
