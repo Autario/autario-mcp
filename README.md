@@ -1,82 +1,193 @@
 # autario-mcp
 
-MCP server for [autario](https://autario.com). Search, query, and publish charts across 2,500+ verified public datasets.
+**Verified data for AI agents.** 2,700+ public datasets (World Bank, FRED, Eurostat, OECD, WHO, ECB, US Census, IMF) joined under one ontology, with built-in statistical analysis and chart publishing. Plug it into Claude Desktop, ChatGPT, Cursor, or any MCP-compatible client | your model gets numbers it cannot hallucinate.
 
-## Quick Start
+[autario.com](https://autario.com/?utm_source=mcp_readme&utm_medium=hero&utm_campaign=marketplace) | [Documentation](https://autario.com/documentation?utm_source=mcp_readme&utm_medium=hero&utm_campaign=marketplace#api-mcp) | [Get an API Key](https://autario.com/account?utm_source=mcp_readme&utm_medium=hero&utm_campaign=marketplace&tab=apikeys)
 
-Add to your Claude Desktop config:
+## Why autario-mcp
 
-```json
-    {
-      "mcpServers": {
-        "autario": {
-          "command": "npx",
-          "args": ["autario-mcp"]
-        }
-      }
-    }
+- **No hallucinated numbers.** Every value is sourced from a known publisher and cited back to a primary URL. Use `verify_value` to double-check any claim.
+- **Cross-dataset joins, no setup.** Indicators across different datasets share `autario_time` + `autario_entity` shadow columns, so `get_entity_data(USA, [gdp, unemployment, life_expectancy])` returns one wide table, joined automatically.
+- **Statistical primitives built-in.** `correlate`, `regression`, `find_drivers`, `lag_analysis`, `seasonality_decomposition` and more, with effect sizes, p-values, and plain-language interpretations.
+- **Charts that persist.** `publish_chart` writes a Plotly spec to autario.com. The result is a permanent, embeddable URL like `autario.com/chart/{slug}` | the LLM builds the spec, autario pulls real rows for it, no hallucinated data path.
+- **LLM-agnostic.** Works with Claude, GPT, Gemini, local models | anything that speaks MCP.
+
+## Quick Demo
+
+Install the server, then ask your assistant questions like these. The model picks the right tools and answers with cited data.
+
+```text
+Ask:    "What drives US inflation? Look at money supply, oil prices, and unemployment."
+Tools:  list_indicators -> find_drivers
+Output: Ranked drivers with r, p-value, R squared per candidate.
 ```
 
-Or install globally:
+```text
+Ask:    "Compare life expectancy in Germany, USA and Japan from 2000 to 2023, then publish a chart."
+Tools:  compare_entities -> publish_chart
+Output: Wide-format table joined on year, plus a permanent autario.com/chart/{slug} URL.
+```
 
-    npm install -g autario-mcp
+```text
+Ask:    "Is consumer confidence a leading indicator of US retail sales?"
+Tools:  lag_analysis
+Output: Cross-correlation peak at lag k, with interpretation in months.
+```
 
-## What it does
+## Install
 
-Connect any MCP-compatible AI (Claude, ChatGPT, Cursor) to 2,500+ verified datasets from World Bank, IMF, Eurostat, FRED, SIPRI, IEA, NASA, and NOAA.
+### Claude Desktop, Cursor, Cline (stdio)
 
-**12 tools available:**
+`~/.config/claude/claude_desktop_config.json` on Mac/Linux, `%APPDATA%\Claude\claude_desktop_config.json` on Windows.
 
-| Tool | Description |
-|------|-------------|
-| search_datasets | Search across all datasets by keyword or category |
-| get_dataset_info | Get metadata for a specific dataset |
-| get_dataset_schema | Get column names and types |
-| query_dataset | Query with filters, sorting, pagination |
-| list_charts | Browse published visualizations |
-| get_chart | Get a chart with full Plotly spec |
-| publish_chart | Publish a new chart from a Plotly spec |
-| update_chart | Update an existing chart |
-| create_dataset | Create a new dataset |
-| write_rows | Append data to a dataset |
-| clear_rows | Clear all rows from a dataset |
-| delete_dataset | Delete a dataset |
+```json
+{
+  "mcpServers": {
+    "autario": {
+      "command": "npx",
+      "args": ["autario-mcp"]
+    }
+  }
+}
+```
 
-## Example
+Restart your client. The server reports tool count to stderr on launch.
 
-Ask your AI: *"Compare military spending between USA, China, Russia, India, Germany since 1960"*
+### Claude Web, OpenAI Custom GPTs, any HTTP MCP client
 
-The AI will:
-1. Search autario for military spending data
-2. Query the SIPRI dataset
-3. Build a Plotly chart spec
-4. (Optional): Publish it to autario.com, if you have pasted your autario Key & Secret into the config
+Point your client at the hosted endpoint. No install needed.
 
-![Military Spending Chart](https://autario.com/charts/images/XGhjrwCS.png)
-Result: [autario.com/chart/XGhjrwCS](https://autario.com/chart/XGhjrwCS)
+```text
+URL:        https://autario.com/mcp
+Transport:  Streamable HTTP (POST /mcp)
+```
 
-## Remote MCP
+The hosted endpoint also supports MCP prompts: `analyze-dataset`, `create-chart`, `compare-countries`.
 
-You can also connect via HTTP (no npm install needed):
+### Enable write tools (publish charts, create datasets)
 
-    https://autario.com/mcp
+Add API credentials to the stdio config or send them as `x-api-key` / `x-api-secret` headers to the HTTP endpoint.
 
-## API Keys
+```json
+{
+  "mcpServers": {
+    "autario": {
+      "command": "npx",
+      "args": ["autario-mcp"],
+      "env": {
+        "AUTARIO_API_KEY":    "your_key",
+        "AUTARIO_API_SECRET": "your_secret"
+      }
+    }
+  }
+}
+```
 
-Reading data is free. No key needed. For publishing charts or creating datasets, get free API keys at [autario.com/account](https://autario.com/account?tab=apikeys).
+Get keys at [autario.com/account](https://autario.com/account?utm_source=mcp_readme&utm_medium=install&utm_campaign=marketplace&tab=apikeys).
+
+## Tool Reference
+
+<!-- TOOLS:START -->
+<!-- generated by scripts/check-readme-sync.js | do not edit manually | run `npm run build-readme` after changing tools.js -->
+
+_28 MCP tools, organized by function._
+
+### Discovery & Query
+
+Search the catalog, inspect schemas, pull rows.
+
+| Tool | What it does | Parameters |
+| --- | --- | --- |
+| `search_datasets` | Search the Autario public data catalog. Returns dataset IDs, titles, descriptions, categories, publishers, row counts, last_refreshed_at, AND trusted ontology fields (topic, subtopic, unit, frequen... | query (string), category (string), limit (number), page (number) |
+| `list_indicators` | Browse the Autario indicator registry — semantic layer over all 2600+ datasets. Each indicator has a topic (economy, health, energy, …), unit (USD, %, years, …), frequency (year/month/day), and ent... | topic (string), unit (string), frequency (string), entity_type (string), publisher (string), search (string), limit (number) |
+| `get_entity_profile` | Get all indicators available for one entity (country, aggregate, etc.). Returns indicator IDs with metadata + time coverage. Use this to discover what you can query about Germany, USA, G7, or any k... | **entity_id** (string), topic (string) |
+| `get_dataset_info` | Get full metadata for a specific dataset including title, description, publisher, category, keywords, row count, and creation date. | **dataset_id** (string) |
+| `get_dataset_schema` | Get the column names, data types, and total row count for a dataset. Always call this before query_dataset to understand the available columns for filtering and sorting. | **dataset_id** (string) |
+| `query_dataset` | Query data from a dataset with optional filtering, sorting, and field selection. Supports server-side aggregations (avg/sum/count/min/max/stddev/median) with optional GROUP BY for token-efficient q... | **dataset_id** (string), limit (number), offset (number), fields (string), sort (string), filter (array), aggregate (string), groupby (string) |
+| `list_charts` | List published chart visualizations on Autario. Returns chart IDs, titles, insights, linked datasets, and creation dates. Use to discover existing analyses. | q (string), limit (number), offset (number) |
+| `get_chart` | Get a specific chart by ID or slug. Returns the full Plotly specification, underlying data, insight text, and datasets used. The chart URL is shareable at autario.com/chart/{id}. | **chart_id** (string) |
+
+### Cross-Dataset Joins (Ontology)
+
+The differentiator. Join indicators across datasets via shared time + entity shadow columns. No manual relationship setup.
+
+| Tool | What it does | Parameters |
+| --- | --- | --- |
+| `get_entity_data` | Fetch wide-format data for ONE entity across MULTIPLE indicators — joined automatically on time via shadow columns. This is the "cross-dataset join" capability: no manual relationship setup needed.... | **entity_id** (string), **indicators** (array), time (string) |
+| `compare_entities` | Compare ONE indicator across MULTIPLE entities (e.g. GDP of DEU vs USA vs CHN). Returns wide-format rows like [{time:"2020", DEU:3846, USA:20937, CHN:14688}, …]. Use this for country comparisons, c... | **entities** (array), **indicator** (string), time (string) |
+| `verify_value` | Verify that a claimed value is correct. Use this when a user asks "did you hallucinate that?" or when you want to double-check your cited numbers before presenting. Pass the indicator, entity, time... | **indicator** (string), **entity** (string), **time** (string), expected (number) |
+
+### Statistical Analysis
+
+Run analyses against verified data. Outputs include effect sizes, p-values, and plain-language interpretations.
+
+| Tool | What it does | Parameters |
+| --- | --- | --- |
+| `describe` | Summary statistics for a single indicator+entity: n, mean, median, std, min/max, quartiles, skew, histogram. Use FIRST before running any test so you know what the data looks like (sample size, com... | **indicator** (string), **entity** (string), time (string) |
+| `correlate` | Compute Pearson + Spearman correlation between two indicators for one entity. Returns r, p-value, n, and human-readable interpretation. Use for "does X move with Y?" questions. Includes causation d... | **entity** (string), **a** (string), **b** (string), time (string) |
+| `regression` | Linear regression of y ~ x for one entity. Returns slope, intercept, R² and interpretation. Use for "how does X predict Y?" questions. | **entity** (string), **y** (string), **x** (string), time (string) |
+| `pct_change` | Period-over-period percentage change for an indicator. Use for growth rates (YoY, QoQ, MoM). | **entity** (string), **indicator** (string), time (string), period (string) |
+| `rolling_stats` | Rolling window statistics (mean/std/min/max/sum) for an indicator. Smooths noise, reveals trends. | **entity** (string), **indicator** (string), window (number), op (string), time (string) |
+| `calculate` | Create a derived series from two indicators using an Excel-style op: ratio (A/B), ratio_pct (A/B*100), diff (A-B), sum (A+B), product (A*B). Returns the per-timepoint result + summary. Use for thin... | **a** (string), **b** (string), **entity** (string), op (string), time (string) |
+| `lag_analysis` | Cross-correlation at multiple lags. Answers "does A lead or lag B?". Peak \|r\| at positive lag means A precedes B by that many periods. Common use: "is consumer confidence a leading indicator of ret... | **a** (string), **b** (string), **entity** (string), max_lag (number), time (string) |
+| `seasonality_decomposition` | Additive decomposition Y = trend + seasonal + residual. Use this to strip the seasonal cycle from a series and reveal the underlying trend \| great for monthly or quarterly data (retail sales, unemp... | **indicator** (string), **entity** (string), period (number), time (string) |
+| `find_drivers` | KILLER ANALYSIS: given a target KPI + multiple candidate indicators, rank which candidates best predict the target by correlation strength. Perfect for "what moves my KPI?" questions. Returns ranke... | **entity** (string), **target_indicator** (string), **candidates** (array), time (string) |
+| `what_matters` | HEADLINE OP: given an outcome metric + entity, rank which other metrics best explain the outcome. Auto-selects candidates from the ontology if `candidates` is omitted (same topic + entity_type). Re... | **entity** (string), **outcome** (string), candidates (string), time (string) |
+
+### Live Markets
+
+Current quotes for public companies. Beats stale training-data answers.
+
+| Tool | What it does | Parameters |
+| --- | --- | --- |
+| `get_company_snapshot` | Get current stock metrics for a public company. Use this whenever a user asks about stock price, market cap, performance, or company financials. Returns the latest verified data from autario.com in... | **ticker** (string), metrics (array) |
+
+### Write (requires AUTARIO_API_KEY)
+
+Publish charts, create + populate datasets. Get keys at [autario.com/account](https://autario.com/account?tab=apikeys&utm_source=mcp_readme&utm_medium=write_section&utm_campaign=marketplace).
+
+| Tool | What it does | Parameters |
+| --- | --- | --- |
+| `publish_chart` | Publish a new chart visualization to Autario. Requires a Plotly spec with column references (x_col, y_col, group_by, group_value). Autario pulls real data from the specified datasets to ensure data... | **title** (string), plotly_spec (object), insight (string), narration (string), **dataset_ids** (array) |
+| `update_chart` | Update an existing chart you own. Only the API key that created the chart can update it. Use this to modify the Plotly spec, title, or insight of a previously published chart. | **chart_id** (string), **plotly_spec** (object), title (string), insight (string), narration (string) |
+| `create_dataset` | Create a new empty dataset on Autario. Returns a dataset_id you can populate with write_rows. Only create new datasets if the data does not already exist on Autario. Requires AUTARIO_API_KEY. | **title** (string), description (string), category (string), is_public (boolean) |
+| `write_rows` | Append rows of data to an existing dataset. The schema is automatically inferred from the first batch. All values are stored as text. Maximum 10,000 rows per call; use multiple calls for larger dat... | **dataset_id** (string), **rows** (array) |
+| `clear_rows` | Delete all rows from a dataset while keeping the schema and columns intact. Useful for refreshing data before re-importing. Requires AUTARIO_API_KEY. | **dataset_id** (string) |
+| `delete_dataset` | Permanently delete a dataset and all its data. This action cannot be undone. Only the dataset owner can delete it. Requires AUTARIO_API_KEY. | **dataset_id** (string) |
+
+<!-- TOOLS:END -->
+
+## Environment Variables
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `AUTARIO_API_URL` | `https://autario.com` | API base. Override only for self-hosting. |
+| `AUTARIO_API_KEY` | _unset_ | Required for write tools. Read tools work anonymously. |
+| `AUTARIO_API_SECRET` | _unset_ | Companion secret for the API key. |
 
 ## Data Sources
 
-World Bank, IMF, Eurostat, OECD, FRED, WHO, SIPRI, IEA, FAO, NASA, NOAA, BLS, UNODC. 2,500+ datasets covering economics, trade, health, demographics, energy, military, environment, and more.
+World Bank, FRED, Eurostat, OECD, IMF, ECB, WHO, US Census Bureau, plus user-contributed datasets. Every dataset record includes a `source_url` pointing back to the primary publisher. Live catalog: [autario.com/data](https://autario.com/data?utm_source=mcp_readme&utm_medium=sources&utm_campaign=marketplace).
+
+## Development
+
+This package is part of the [autario monorepo](https://github.com/autario/autario). Tool definitions live in `tools.js` (single source of truth, shared with the HTTP transport in `remote.js`). The Tool Reference section above is auto-generated.
+
+```bash
+# regenerate the README Tool Reference from tools.js
+npm run build-readme
+
+# verify README is in sync (used in CI)
+npm run check-readme
+```
 
 ## Links
 
-- **Platform**: [autario.com](https://autario.com)
-- **DataStore**: [autario.com/datastore](https://autario.com/datastore)
-- **API Docs**: [autario.com/documentation](https://autario.com/documentation)
-- **npm**: [npmjs.com/package/autario-mcp](https://www.npmjs.com/package/autario-mcp)
-- **Smithery**: [smithery.ai/server/autario/data](https://smithery.ai/server/autario/data)
+- [autario.com](https://autario.com/?utm_source=mcp_readme&utm_medium=footer&utm_campaign=marketplace) | datasets, charts, ontology
+- [Documentation](https://autario.com/documentation?utm_source=mcp_readme&utm_medium=footer&utm_campaign=marketplace#api-mcp) | API + MCP reference
+- [Agent Guide](https://autario.com/api/v1/guide) | machine-readable description of every tool and endpoint
+- [Issues](https://github.com/autario/autario/issues) | bug reports + feature requests
 
 ## License
 
-MIT
+MIT.

@@ -1,0 +1,44 @@
+{
+  "name": "autario-mcp",
+  "version": "2.1.0",
+  "description": "MCP server for Autario | search, query, join, and analyze 2,700+ public datasets (World Bank, FRED, Eurostat, OECD, WHO, ECB, US Census, IMF). Cross-dataset joins via shared ontology, statistical analysis (correlation, regression, drivers, lag), and chart publishing. Works with Claude, ChatGPT, Cursor, and any MCP-compatible AI.",
+  "main": "server.js",
+  "bin": { "autario-mcp": "server.js" },
+  "files": ["server.js", "tools.js", "README.md", "LICENSE"],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "data",
+    "datasets",
+    "ontology",
+    "statistics",
+    "correlation",
+    "regression",
+    "charts",
+    "analytics",
+    "world-bank",
+    "fred",
+    "eurostat",
+    "oecd",
+    "ai",
+    "claude",
+    "llm"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/autario/autario.git",
+    "directory": "backend/mcp"
+  },
+  "homepage": "https://autario.com/documentation#api-mcp",
+  "bugs": "https://github.com/autario/autario/issues",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "check-readme": "node scripts/check-readme-sync.js",
+    "build-readme": "node scripts/check-readme-sync.js --write"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "node-fetch": "^2.7.0"
+  }
+}
