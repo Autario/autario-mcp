@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Autario/autario-mcp",
+  "description": "Connect your ads, shop, analytics, social, CRM and finance tools, and let AI explain the numbers.",
+  "repository": {
+    "url": "https://github.com/Autario/autario-mcp",
+    "source": "github"
+  },
+  "version": "2.21.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "autario-mcp",
+      "version": "2.21.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Autario API key from autario.com account settings. Optional: public datasets and stats work without it; needed for private data, connectors and publishing.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "AUTARIO_API_KEY"
+        },
+        {
+          "description": "Autario API secret paired with AUTARIO_API_KEY. Optional, same scope as the key.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "AUTARIO_API_SECRET"
+        }
+      ]
+    }
+  ]
+}
