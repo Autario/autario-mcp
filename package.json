@@ -1,6 +1,6 @@
 {
   "name": "autario-mcp",
-  "version": "2.21.2",
+  "version": "3.0.1",
   "mcpName": "io.github.Autario/autario-mcp",
   "description": "MCP server for autario: connect your ads, shop, analytics, social, CRM and finance platforms once, then let Claude, ChatGPT, Cursor or any MCP client read, join and explain your numbers, with public statistics from the World Bank, FRED, Eurostat and OECD as context.",
   "main": "server.js",
@@ -9,13 +9,7 @@
   },
   "files": [
     "server.js",
-    "minimalResponse.js",
-    "tools.js",
-    "tools-common.js",
-    "tools-data.js",
-    "tools-viz.js",
-    "tools-apps.js",
-    "chartInstructions.js",
+    "bridge.js",
     "README.md",
     "LICENSE"
   ],
@@ -65,7 +59,6 @@
     "build-readme": "node scripts/check-readme-sync.js --write"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.10.2",
-    "node-fetch": "^2.7.0"
+    "@modelcontextprotocol/sdk": "^1.32.1"
   }
 }
